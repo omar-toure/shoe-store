@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - ShoeStore</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">ShoeStore</a>
+            <div class="nav-links">
+                <a href="index.html">Accueil</a>
+                <a href="products.html">Produits</a>
+                <a href="about.html">À propos</a>
+                <a href="contact.html" class="active">Contact</a>
+            </div>
+            <div class="cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main class="contact-page">
+        <section class="contact-hero">
+            <h1>Contactez-nous</h1>
+            <p>Nous sommes là pour vous aider</p>
+        </section>
+
+        <section class="contact-content">
+            <div class="contact-info">
+                <div class="contact-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Adresse</h3>
+                    <p>123 Avenue Cheikh Anta Diop<br>Dakar, Sénégal</p>
+                </div>
+                <div class="contact-card">
+                    <i class="fas fa-phone"></i>
+                    <h3>Téléphone</h3>
+                    <p>+221 33 825 XX XX</p>
+                </div>
+                <div class="contact-card">
+                    <i class="fas fa-envelope"></i>
+                    <h3>Email</h3>
+                    <p>contact@shoestore.sn</p>
+                </div>
+            </div>
+
+            <form class="contact-form" id="contact-form">
+                <h2>Envoyez-nous un message</h2>
+                <div class="form-group">
+                    <label for="name">Nom complet</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject">Sujet</label>
+                    <input type="text" id="subject" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="submit-button">Envoyer le message</button>
+            </form>
+        </section>
+
+        <section class="faq">
+            <h2>Questions fréquentes</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>Comment suivre ma commande ?</h3>
+                    <p>Vous recevrez un SMS de confirmation avec un numéro de suivi dès que votre commande sera expédiée.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Quel est le délai de livraison ?</h3>
+                    <p>La livraison prend 24h à Dakar et 2-3 jours pour les autres régions du Sénégal.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Quels sont les modes de paiement acceptés ?</h3>
+                    <p>Nous acceptons Orange Money, Wave, Free Money, et le paiement à la livraison.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>À propos de ShoeStore</h3>
+                <p>Votre destination en ligne pour des chaussures de qualité.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: contact@shoestore.sn</p>
+                <p>Téléphone: +221 33 825 XX XX</p>
+            </div>
+            <div class="footer-section">
+                <h3>Suivez-nous</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 ShoeStore. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

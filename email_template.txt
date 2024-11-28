@@ -1,0 +1,18 @@
+Sujet: Nouvelle commande de {{from_name}}
+
+Détails du client :
+- Nom : {{from_name}}
+- Email : {{customer_email}}
+- Téléphone : {{customer_phone}}
+- Adresse : {{customer_address}}
+- Mode de paiement : {{payment_method}}
+
+Articles commandés :
+{{order_details}}
+
+Montant total : {{total_amount}}
+
+Cette commande a été passée via la boutique en ligne ShoeStore.
+--
+ShoeStore Sénégal
+Commande reçue automatiquement via le site web

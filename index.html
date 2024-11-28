@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShoeStore - Votre boutique de chaussures au Sénégal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            try {
+                emailjs.init("-w9IMzLI5y3nKnZk5");
+                window.emailjsInitialized = true;
+                console.log('EmailJS initialisé avec succès');
+            } catch (error) {
+                console.error('Erreur lors de l\'initialisation d\'EmailJS:', error);
+            }
+        })();
+    </script>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">ShoeStore</a>
+            <div class="nav-links">
+                <a href="index.html" class="active">Accueil</a>
+                <a href="#featured-products">Produits</a>
+                <a href="#features">À propos</a>
+                <a href="#footer-contact">Contact</a>
+            </div>
+            <div class="cart-icon" onclick="openCartModal()">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Découvrez notre collection de chaussures</h1>
+            <p>Le meilleur de la mode au Sénégal</p>
+            <a href="#featured-products" class="cta-button">Voir la collection</a>
+        </section>
+
+        <section id="featured-products" class="products">
+            <h2>Nos Meilleures Ventes</h2>
+            <div class="product-grid" id="product-grid">
+                <!-- Les produits seront ajoutés ici dynamiquement -->
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="feature">
+                <i class="fas fa-truck"></i>
+                <h3>Livraison Rapide</h3>
+                <p>24h à Dakar, 2-3 jours dans les régions</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Paiement Mobile</h3>
+                <p>Orange Money, Wave, Free Money</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Garantie Qualité</h3>
+                <p>Produits 100% authentiques</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal du panier -->
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-content">
+            <!-- Le contenu du panier sera ajouté ici dynamiquement -->
+        </div>
+    </div>
+
+    <footer id="footer-contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>À propos de ShoeStore</h3>
+                <p>Votre boutique de chaussures de référence au Sénégal. Nous proposons une large gamme de chaussures authentiques pour tous les styles.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p><i class="fas fa-envelope"></i> Email: contact@shoestore.sn</p>
+                <p><i class="fas fa-phone"></i> Téléphone: +221 78 465 99 01</p>
+                <p><i class="fas fa-map-marker-alt"></i> Adresse: Dakar, Sénégal</p>
+            </div>
+            <div class="footer-section">
+                <h3>Suivez-nous</h3>
+                <div class="social-links">
+                    <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 ShoeStore Sénégal. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

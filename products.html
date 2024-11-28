@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nos Produits - ShoeStore</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">ShoeStore</a>
+            <div class="nav-links">
+                <a href="index.html">Accueil</a>
+                <a href="products.html" class="active">Produits</a>
+                <a href="about.html">À propos</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main class="products-page">
+        <section class="products-hero">
+            <h1>Nos Produits</h1>
+            <p>Découvrez notre collection de chaussures</p>
+        </section>
+
+        <section class="products">
+            <div class="filters">
+                <select id="category-filter">
+                    <option value="all">Toutes les catégories</option>
+                    <option value="sport">Sport</option>
+                    <option value="casual">Casual</option>
+                    <option value="elegant">Élégant</option>
+                </select>
+                <select id="price-filter">
+                    <option value="all">Tous les prix</option>
+                    <option value="low">Moins de 50€</option>
+                    <option value="medium">50€ - 100€</option>
+                    <option value="high">Plus de 100€</option>
+                </select>
+            </div>
+            <div class="product-grid" id="product-grid">
+                <!-- Products will be dynamically added here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>À propos de ShoeStore</h3>
+                <p>Votre destination en ligne pour des chaussures de qualité.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: contact@shoestore.com</p>
+                <p>Téléphone: 01 23 45 67 89</p>
+            </div>
+            <div class="footer-section">
+                <h3>Suivez-nous</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 ShoeStore. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-content">
+            <h2>Panier</h2>
+            <div class="cart-items" id="cart-items">
+                <!-- Cart items will be dynamically added here -->
+            </div>
+            <div class="cart-total">
+                <p>Total: <span id="cart-total-amount">0.00€</span></p>
+                <button class="checkout-button">Commander</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
