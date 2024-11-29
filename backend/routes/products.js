@@ -30,25 +30,45 @@ const upload = multer({
     }
 });
 
+// Middleware pour logger les requêtes
+router.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - Products API - ${req.method} ${req.url}`);
+    next();
+});
+
 // Créer un produit
 router.post('/', auth, upload.single('image'), async (req, res) => {
     try {
+        console.log('Données reçues:', req.body);
+        console.log('Fichier reçu:', req.file);
+
+        if (!req.file) {
+            return res.status(400).json({ message: 'Une image est requise' });
+        }
+
         const productData = {
             name: req.body.name,
             price: parseFloat(req.body.price),
             category: req.body.category,
             description: req.body.description,
-            sizes: req.body.sizes.split(',').map(size => size.trim()),
+            sizes: req.body.sizes.split(',').map(size => parseInt(size.trim())),
             stock: parseInt(req.body.stock),
-            image: req.file ? `/uploads/${req.file.filename}` : null
+            image: `/uploads/${req.file.filename}`
         };
+
+        console.log('Données du produit à sauvegarder:', productData);
 
         const product = new Product(productData);
         await product.save();
+        
+        console.log('Produit sauvegardé avec succès:', product);
         res.status(201).json(product);
     } catch (error) {
         console.error('Erreur création produit:', error);
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ 
+            message: 'Erreur lors de la création du produit',
+            error: error.message 
+        });
     }
 });
 

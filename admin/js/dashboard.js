@@ -60,44 +60,56 @@ imageInput.addEventListener('change', function(e) {
 productForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const formData = new FormData();
-    const description = document.getElementById('description').value.trim();
-    
-    if (!description) {
-        alert('La description est requise');
-        return;
-    }
-    
-    formData.append('name', document.getElementById('name').value.trim());
-    formData.append('price', document.getElementById('price').value);
-    formData.append('category', document.getElementById('category').value);
-    formData.append('description', description);
-    formData.append('sizes', document.getElementById('sizes').value.trim());
-    formData.append('stock', document.getElementById('stock').value);
-    
-    const imageFile = document.getElementById('image').files[0];
-    if (imageFile) {
-        formData.append('image', imageFile);
-    }
-
     try {
+        const formData = new FormData();
+        const description = document.getElementById('description').value.trim();
+        
+        if (!description) {
+            alert('La description est requise');
+            return;
+        }
+        
+        formData.append('name', document.getElementById('name').value.trim());
+        formData.append('price', document.getElementById('price').value);
+        formData.append('category', document.getElementById('category').value);
+        formData.append('description', description);
+        formData.append('sizes', document.getElementById('sizes').value.trim());
+        formData.append('stock', document.getElementById('stock').value);
+        
+        const imageFile = document.getElementById('image').files[0];
+        if (!currentProductId && !imageFile) {
+            alert('Une image est requise pour un nouveau produit');
+            return;
+        }
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            throw new Error('Non authentifié');
+        }
+
         const url = currentProductId 
             ? `${API_BASE_URL}/products/${currentProductId}`
             : `${API_BASE_URL}/products`;
             
         const method = currentProductId ? 'PUT' : 'POST';
         
+        console.log('Envoi de la requête à:', url);
+        console.log('Méthode:', method);
+        
         const response = await fetch(url, {
             method: method,
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                'Authorization': `Bearer ${token}`
             },
             body: formData
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Erreur lors de l\'ajout du produit');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erreur lors de l\'ajout du produit');
         }
 
         const result = await response.json();
@@ -107,8 +119,8 @@ productForm.addEventListener('submit', async function(e) {
         closeProductModal();
         loadProducts();
     } catch (error) {
-        console.error('Erreur:', error);
-        alert(error.message);
+        console.error('Erreur détaillée:', error);
+        alert('Erreur: ' + error.message);
     }
 });
 

@@ -11,10 +11,11 @@ const app = express();
 
 // Configuration CORS détaillée
 app.use(cors({
-    origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    credentials: true,
+    maxAge: 86400
 }));
 
 // Middleware
@@ -25,6 +26,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
 app.use(express.static(path.join(__dirname, '../')));
+
+// Middleware pour logger les requêtes
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
 
 // Routes API
 app.use('/api/auth', authRoutes);
@@ -51,7 +58,7 @@ if (!fs.existsSync(uploadsDir)) {
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error('Erreur:', err.stack);
     res.status(500).json({ 
         message: 'Une erreur est survenue !',
         error: process.env.NODE_ENV === 'development' ? err.message : {}
