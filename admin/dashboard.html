@@ -3,116 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShoeStore Admin - Tableau de bord</title>
+    <title>Dashboard Admin - Shoe Store</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="admin-dashboard">
-    <nav class="admin-nav">
-        <div class="nav-brand">
-            <i class="fas fa-shoe-prints"></i> ShoeStore Admin
-        </div>
-        <div class="nav-user">
-            <span id="user-email"></span>
-            <button onclick="logout()" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Déconnexion
-            </button>
-        </div>
-    </nav>
-
+<body>
     <div class="dashboard-container">
-        <aside class="sidebar">
-            <button class="action-btn add-product-btn" onclick="showAddProductModal()">
-                <i class="fas fa-plus"></i> Ajouter un produit
-            </button>
-            <div class="filters">
-                <h3>Filtres</h3>
-                <select id="category-filter" onchange="filterProducts()">
-                    <option value="">Toutes les catégories</option>
-                    <option value="sport">Sport</option>
-                    <option value="ville">Ville</option>
-                    <option value="sandales">Sandales</option>
-                </select>
-                <select id="stock-filter" onchange="filterProducts()">
-                    <option value="">Tout le stock</option>
-                    <option value="true">En stock</option>
-                    <option value="false">Rupture de stock</option>
-                </select>
+        <header class="dashboard-header">
+            <h1>Dashboard Admin</h1>
+            <div class="user-info">
+                <span id="user-email"></span>
+                <button onclick="logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </button>
             </div>
-        </aside>
+        </header>
 
-        <main class="main-content">
-            <div class="products-grid" id="products-grid">
-                <!-- Les produits seront ajoutés ici dynamiquement -->
+        <main class="dashboard-main">
+            <div class="actions-bar">
+                <button onclick="showAddProductModal()" class="add-btn">
+                    <i class="fas fa-plus"></i> Ajouter un Produit
+                </button>
             </div>
+
+            <div id="no-products" style="display: none;">
+                <p>Aucun produit disponible. Commencez par en ajouter un !</p>
+            </div>
+
+            <div id="products-list" class="products-grid"></div>
         </main>
-    </div>
 
-    <!-- Modal Ajout/Modification de produit -->
-    <div id="product-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeProductModal()">&times;</span>
-            <h2 id="modal-title">Ajouter un produit</h2>
-            <form id="product-form">
-                <div class="form-group">
-                    <label for="product-name">Nom du produit</label>
-                    <input type="text" id="product-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="product-price">Prix (FCFA)</label>
-                    <input type="number" id="product-price" required>
-                </div>
-                <div class="form-group">
-                    <label for="product-category">Catégorie</label>
-                    <select id="product-category" required>
-                        <option value="sport">Sport</option>
-                        <option value="ville">Ville</option>
-                        <option value="sandales">Sandales</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="product-sizes">Tailles disponibles</label>
-                    <div class="sizes-grid">
-                        <label><input type="checkbox" value="36"> 36</label>
-                        <label><input type="checkbox" value="37"> 37</label>
-                        <label><input type="checkbox" value="38"> 38</label>
-                        <label><input type="checkbox" value="39"> 39</label>
-                        <label><input type="checkbox" value="40"> 40</label>
-                        <label><input type="checkbox" value="41"> 41</label>
-                        <label><input type="checkbox" value="42"> 42</label>
-                        <label><input type="checkbox" value="43"> 43</label>
-                        <label><input type="checkbox" value="44"> 44</label>
-                        <label><input type="checkbox" value="45"> 45</label>
+        <!-- Modal Ajout/Modification Produit -->
+        <div id="product-modal" class="modal">
+            <div class="modal-content">
+                <button class="close-button" onclick="closeProductModal()">×</button>
+                <h2 id="modal-title">Ajouter un Produit</h2>
+                
+                <form id="product-form">
+                    <div class="form-group">
+                        <label for="name">Nom du Produit</label>
+                        <input type="text" id="name" required>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="product-image">Image</label>
-                    <input type="file" id="product-image" accept="image/*" required>
-                    <div id="image-preview" class="image-preview"></div>
-                </div>
-                <div class="form-group">
-                    <label for="product-description">Description</label>
-                    <textarea id="product-description" rows="4"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="product-instock" checked>
-                        En stock
-                    </label>
-                </div>
-                <button type="submit" class="submit-btn">Enregistrer</button>
-            </form>
-        </div>
-    </div>
 
-    <!-- Modal de confirmation -->
-    <div id="confirm-modal" class="modal">
-        <div class="modal-content">
-            <h2>Confirmation</h2>
-            <p id="confirm-message"></p>
-            <div class="modal-actions">
-                <button onclick="confirmAction()" class="danger-btn">Confirmer</button>
-                <button onclick="closeConfirmModal()" class="cancel-btn">Annuler</button>
+                    <div class="form-group">
+                        <label for="price">Prix (FCFA)</label>
+                        <input type="number" id="price" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Catégorie</label>
+                        <select id="category" required>
+                            <option value="">Sélectionnez une catégorie</option>
+                            <option value="hommes">Hommes</option>
+                            <option value="femmes">Femmes</option>
+                            <option value="enfants">Enfants</option>
+                            <option value="sport">Sport</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image">Image</label>
+                        <input type="file" id="image" accept="image/*" required>
+                        <div id="image-preview"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sizes">Tailles Disponibles (séparées par des virgules)</label>
+                        <input type="text" id="sizes" required placeholder="Ex: 38, 39, 40, 41">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stock">Stock</label>
+                        <input type="number" id="stock" required min="0">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeProductModal()">Annuler</button>
+                        <button type="submit" class="btn-submit">Ajouter le Produit</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

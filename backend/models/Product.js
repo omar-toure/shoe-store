@@ -11,24 +11,28 @@ const productSchema = new mongoose.Schema({
     },
     category: {
         type: String,
+        required: true,
+        enum: ['homme', 'femme', 'enfant']
+    },
+    description: {
+        type: String,
         required: true
     },
     image: {
         type: String,
         required: true
     },
-    sizes: [{
-        type: Number
-    }],
-    description: String,
-    inStock: {
-        type: Boolean,
-        default: true
+    sizes: {
+        type: [Number],
+        required: true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    stock: {
+        type: Number,
+        required: true,
+        default: 0
     }
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('Product', productSchema);

@@ -1,212 +1,224 @@
-// Configuration
-const API_URL = 'http://localhost:5000/api';
-let currentProduct = null;
-let token = localStorage.getItem('adminToken');
+const API_BASE_URL = 'http://localhost:8080/api';
 
-// Vérifier l'authentification
-function checkAuth() {
-    if (!token) {
-        window.location.href = '/admin/login.html';
-        return;
+// Vérification du token et redirection si non connecté
+if (!localStorage.getItem('token')) {
+    window.location.href = '/admin/login.html';
+}
+
+// Affichage de l'email de l'utilisateur
+fetch(`${API_BASE_URL}/auth/verify`, {
+    headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
-    document.getElementById('user-email').textContent = localStorage.getItem('adminEmail');
-}
-
-// Charger les produits
-async function loadProducts() {
-    try {
-        const response = await fetch(`${API_URL}/products`, {
-            headers: {
-                'x-auth-token': token
-            }
-        });
-        const products = await response.json();
-        displayProducts(products);
-    } catch (error) {
-        showError('Erreur lors du chargement des produits');
+})
+.then(response => {
+    if (!response.ok) throw new Error('Erreur de vérification');
+    return response.json();
+})
+.then(data => {
+    if (data.valid) {
+        document.getElementById('user-email').textContent = 'Admin';
+    } else {
+        logout();
     }
-}
+})
+.catch(error => {
+    console.error('Erreur de vérification:', error);
+    logout();
+});
 
-// Afficher les produits
-function displayProducts(products) {
-    const grid = document.getElementById('products-grid');
-    grid.innerHTML = '';
-
-    products.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-            <img src="${product.image}" alt="${product.name}" class="product-image">
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>${product.price.toLocaleString()} FCFA</p>
-                <p>Catégorie: ${product.category}</p>
-                <p>Stock: ${product.inStock ? 'Disponible' : 'Rupture'}</p>
-                <div class="product-actions">
-                    <button onclick="editProduct('${product._id}')" class="action-btn">
-                        <i class="fas fa-edit"></i> Modifier
-                    </button>
-                    <button onclick="deleteProduct('${product._id}')" class="danger-btn">
-                        <i class="fas fa-trash"></i> Supprimer
-                    </button>
-                </div>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
-}
-
-// Gérer le formulaire de produit
-async function handleProductForm(e) {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append('name', document.getElementById('product-name').value);
-    formData.append('price', document.getElementById('product-price').value);
-    formData.append('category', document.getElementById('product-category').value);
-    formData.append('description', document.getElementById('product-description').value);
-    formData.append('inStock', document.getElementById('product-instock').checked);
-
-    // Récupérer les tailles sélectionnées
-    const sizes = Array.from(document.querySelectorAll('.sizes-grid input:checked'))
-        .map(input => parseInt(input.value));
-    formData.append('sizes', JSON.stringify(sizes));
-
-    // Ajouter l'image si elle existe
-    const imageInput = document.getElementById('product-image');
-    if (imageInput.files.length > 0) {
-        formData.append('image', imageInput.files[0]);
-    }
-
-    try {
-        const url = currentProduct
-            ? `${API_URL}/products/${currentProduct._id}`
-            : `${API_URL}/products`;
-
-        const method = currentProduct ? 'PUT' : 'POST';
-
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'x-auth-token': token
-            },
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error('Erreur lors de l\'enregistrement');
-        }
-
-        closeProductModal();
-        loadProducts();
-        showSuccess(currentProduct ? 'Produit modifié avec succès' : 'Produit ajouté avec succès');
-    } catch (error) {
-        showError('Erreur lors de l\'enregistrement du produit');
-    }
-}
-
-// Modifier un produit
-async function editProduct(id) {
-    try {
-        const response = await fetch(`${API_URL}/products/${id}`, {
-            headers: {
-                'x-auth-token': token
-            }
-        });
-        currentProduct = await response.json();
-        
-        // Remplir le formulaire
-        document.getElementById('product-name').value = currentProduct.name;
-        document.getElementById('product-price').value = currentProduct.price;
-        document.getElementById('product-category').value = currentProduct.category;
-        document.getElementById('product-description').value = currentProduct.description;
-        document.getElementById('product-instock').checked = currentProduct.inStock;
-
-        // Cocher les tailles
-        document.querySelectorAll('.sizes-grid input').forEach(input => {
-            input.checked = currentProduct.sizes.includes(parseInt(input.value));
-        });
-
-        // Afficher l'image actuelle
-        const preview = document.getElementById('image-preview');
-        preview.innerHTML = `<img src="${currentProduct.image}" alt="Preview">`;
-
-        document.getElementById('modal-title').textContent = 'Modifier le produit';
-        showProductModal();
-    } catch (error) {
-        showError('Erreur lors du chargement du produit');
-    }
-}
-
-// Supprimer un produit
-async function deleteProduct(id) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
-        try {
-            await fetch(`${API_URL}/products/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'x-auth-token': token
-                }
-            });
-            loadProducts();
-            showSuccess('Produit supprimé avec succès');
-        } catch (error) {
-            showError('Erreur lors de la suppression du produit');
-        }
-    }
-}
-
-// Fonctions utilitaires pour les modals
-function showProductModal() {
-    document.getElementById('product-modal').style.display = 'block';
-}
-
-function closeProductModal() {
-    document.getElementById('product-modal').style.display = 'none';
-    document.getElementById('product-form').reset();
-    document.getElementById('image-preview').innerHTML = '';
-    currentProduct = null;
-}
-
-function showAddProductModal() {
-    document.getElementById('modal-title').textContent = 'Ajouter un produit';
-    showProductModal();
-}
+// Gestion du formulaire d'ajout/modification de produit
+const productForm = document.getElementById('product-form');
+const imageInput = document.getElementById('image');
+const imagePreview = document.getElementById('image-preview');
 
 // Prévisualisation de l'image
-document.getElementById('product-image').addEventListener('change', function(e) {
+imageInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            const preview = document.getElementById('image-preview');
-            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            imagePreview.innerHTML = '';
+            imagePreview.appendChild(img);
         }
         reader.readAsDataURL(file);
     }
 });
 
-// Messages de notification
-function showSuccess(message) {
-    // Implémenter une notification de succès
-    alert(message);
+// Soumission du formulaire
+productForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    formData.append('name', document.getElementById('name').value);
+    formData.append('price', document.getElementById('price').value);
+    formData.append('category', document.getElementById('category').value);
+    formData.append('description', document.getElementById('description').value);
+    formData.append('image', document.getElementById('image').files[0]);
+    formData.append('sizes', document.getElementById('sizes').value);
+    formData.append('stock', document.getElementById('stock').value);
+
+    try {
+        const url = currentProductId 
+            ? `${API_BASE_URL}/products/${currentProductId}`
+            : `${API_BASE_URL}/products`;
+            
+        const method = currentProductId ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Erreur lors de l\'ajout du produit');
+        }
+
+        alert(currentProductId ? 'Produit modifié avec succès' : 'Produit ajouté avec succès');
+        closeProductModal();
+        loadProducts();
+    } catch (error) {
+        console.error('Erreur:', error);
+        alert(error.message);
+    }
+});
+
+// Chargement des produits
+async function loadProducts() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/products`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erreur lors du chargement des produits');
+        }
+
+        const products = await response.json();
+        const productsList = document.getElementById('products-list');
+        const noProducts = document.getElementById('no-products');
+        
+        if (products.length === 0) {
+            noProducts.style.display = 'block';
+            productsList.innerHTML = '';
+            return;
+        }
+        
+        noProducts.style.display = 'none';
+        productsList.innerHTML = products.map(product => `
+            <div class="product-card">
+                <img src="${product.image}" alt="${product.name}" class="product-image">
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <p class="price">${product.price.toLocaleString('fr-FR')} FCFA</p>
+                    <p class="stock">Stock: ${product.stock}</p>
+                    <div class="product-actions">
+                        <button onclick="editProduct('${product._id}')" class="edit-btn">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                        <button onclick="deleteProduct('${product._id}')" class="delete-btn">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors du chargement des produits');
+    }
 }
 
-function showError(message) {
-    // Implémenter une notification d'erreur
-    alert(message);
+// Éditer un produit
+async function editProduct(productId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erreur lors du chargement du produit');
+        }
+
+        const product = await response.json();
+        
+        document.getElementById('name').value = product.name;
+        document.getElementById('price').value = product.price;
+        document.getElementById('category').value = product.category;
+        document.getElementById('description').value = product.description;
+        document.getElementById('sizes').value = product.sizes.join(', ');
+        document.getElementById('stock').value = product.stock;
+
+        if (product.image) {
+            const img = document.createElement('img');
+            img.src = product.image;
+            imagePreview.innerHTML = '';
+            imagePreview.appendChild(img);
+        }
+
+        currentProductId = productId;
+        document.getElementById('modal-title').textContent = 'Modifier le Produit';
+        document.getElementById('product-modal').style.display = 'block';
+    } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors du chargement du produit');
+    }
+}
+
+// Supprimer un produit
+async function deleteProduct(productId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la suppression');
+            }
+
+            alert('Produit supprimé avec succès');
+            loadProducts();
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la suppression du produit');
+        }
+    }
+}
+
+// Fonctions modales
+function showAddProductModal() {
+    currentProductId = null;
+    document.getElementById('modal-title').textContent = 'Ajouter un Produit';
+    productForm.reset();
+    imagePreview.innerHTML = '';
+    document.getElementById('product-modal').style.display = 'block';
+}
+
+function closeProductModal() {
+    document.getElementById('product-modal').style.display = 'none';
 }
 
 // Déconnexion
 function logout() {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminEmail');
+    localStorage.removeItem('token');
     window.location.href = '/admin/login.html';
 }
 
-// Initialisation
+// Chargement initial des produits
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
     loadProducts();
-    document.getElementById('product-form').addEventListener('submit', handleProductForm);
 });
