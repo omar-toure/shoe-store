@@ -1,38 +1,39 @@
 const API_BASE_URL = window.location.origin + '/api';
 
 // Vérification du token et redirection si non connecté
-function checkAuth() {
+async function checkAuth() {
     const token = localStorage.getItem('adminToken');
     if (!token) {
-        window.location.href = '/admin/login.html';
+        window.location.replace('/admin/login.html');
         return;
     }
 
-    // Vérification du token
-    fetch(`${API_BASE_URL}/auth/verify`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    })
-    .then(response => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/verify`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
         if (!response.ok) {
-            throw new Error('Token invalide');
+            throw new Error('Session invalide');
         }
-        return response.json();
-    })
-    .then(data => {
+
+        const data = await response.json();
         if (!data.valid) {
             throw new Error('Session expirée');
         }
+
+        // Afficher l'email de l'utilisateur
         const adminEmail = localStorage.getItem('adminEmail');
         document.getElementById('user-email').textContent = adminEmail || 'Admin';
-    })
-    .catch(error => {
+
+    } catch (error) {
         console.error('Erreur d\'authentification:', error);
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminEmail');
-        window.location.href = '/admin/login.html';
-    });
+        window.location.replace('/admin/login.html');
+    }
 }
 
 // Gestion du formulaire d'ajout/modification de produit
@@ -221,14 +222,29 @@ function closeProductModal() {
 }
 
 // Déconnexion
-function logout() {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminEmail');
-    window.location.href = '/admin/login.html';
+async function logout() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            }
+        });
+
+        if (!response.ok) {
+            console.error('Erreur lors de la déconnexion');
+        }
+    } catch (error) {
+        console.error('Erreur lors de la déconnexion:', error);
+    } finally {
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminEmail');
+        window.location.replace('/admin/login.html');
+    }
 }
 
 // Initialisation
-document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
+document.addEventListener('DOMContentLoaded', async () => {
+    await checkAuth();
     loadProducts();
 });

@@ -1,10 +1,29 @@
 const API_URL = window.location.origin + '/api';
 
 // Vérifier si déjà connecté
-function checkAuth() {
+async function checkAuth() {
     const token = localStorage.getItem('adminToken');
-    if (token) {
-        window.location.href = '/admin/dashboard.html';
+    if (!token) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/auth/verify`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.valid) {
+                window.location.href = '/admin/dashboard.html';
+            }
+        }
+    } catch (error) {
+        console.error('Erreur de vérification:', error);
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminEmail');
     }
 }
 
@@ -14,6 +33,8 @@ async function handleLogin(e) {
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.style.display = 'none';
 
     try {
         const response = await fetch(`${API_URL}/auth/login`, {
@@ -24,14 +45,15 @@ async function handleLogin(e) {
             body: JSON.stringify({ email, password })
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            throw new Error('Email ou mot de passe incorrect');
+            throw new Error(data.message || 'Email ou mot de passe incorrect');
         }
 
-        const data = await response.json();
         localStorage.setItem('adminToken', data.token);
-        localStorage.setItem('adminEmail', email);
-        window.location.href = '/admin/dashboard.html';
+        localStorage.setItem('adminEmail', data.user.email);
+        window.location.replace('/admin/dashboard.html');
     } catch (error) {
         showError(error.message);
     }
