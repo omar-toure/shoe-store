@@ -1,31 +1,39 @@
 const API_BASE_URL = window.location.origin + '/api';
 
 // Vérification du token et redirection si non connecté
-if (!localStorage.getItem('token')) {
-    window.location.href = '/admin/login.html';
-}
+function checkAuth() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        window.location.href = '/admin/login.html';
+        return;
+    }
 
-// Affichage de l'email de l'utilisateur
-fetch(`${API_BASE_URL}/auth/verify`, {
-    headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-    }
-})
-.then(response => {
-    if (!response.ok) throw new Error('Erreur de vérification');
-    return response.json();
-})
-.then(data => {
-    if (data.valid) {
-        document.getElementById('user-email').textContent = 'Admin';
-    } else {
-        logout();
-    }
-})
-.catch(error => {
-    console.error('Erreur de vérification:', error);
-    logout();
-});
+    // Vérification du token
+    fetch(`${API_BASE_URL}/auth/verify`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Token invalide');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data.valid) {
+            throw new Error('Session expirée');
+        }
+        const adminEmail = localStorage.getItem('adminEmail');
+        document.getElementById('user-email').textContent = adminEmail || 'Admin';
+    })
+    .catch(error => {
+        console.error('Erreur d\'authentification:', error);
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminEmail');
+        window.location.href = '/admin/login.html';
+    });
+}
 
 // Gestion du formulaire d'ajout/modification de produit
 const productForm = document.getElementById('product-form');
@@ -70,7 +78,7 @@ productForm.addEventListener('submit', async function(e) {
         const response = await fetch(url, {
             method: method,
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             },
             body: formData
         });
@@ -94,7 +102,7 @@ async function loadProducts() {
     try {
         const response = await fetch(`${API_BASE_URL}/products`, {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
         });
 
@@ -142,7 +150,7 @@ async function editProduct(productId) {
     try {
         const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
         });
 
@@ -182,7 +190,7 @@ async function deleteProduct(productId) {
             const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
                 }
             });
 
@@ -214,11 +222,13 @@ function closeProductModal() {
 
 // Déconnexion
 function logout() {
-    localStorage.removeItem('token');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminEmail');
     window.location.href = '/admin/login.html';
 }
 
-// Chargement initial des produits
+// Initialisation
 document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
     loadProducts();
 });
