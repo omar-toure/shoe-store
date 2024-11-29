@@ -61,13 +61,24 @@ productForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const formData = new FormData();
-    formData.append('name', document.getElementById('name').value);
+    const description = document.getElementById('description').value.trim();
+    
+    if (!description) {
+        alert('La description est requise');
+        return;
+    }
+    
+    formData.append('name', document.getElementById('name').value.trim());
     formData.append('price', document.getElementById('price').value);
     formData.append('category', document.getElementById('category').value);
-    formData.append('description', document.getElementById('description').value);
-    formData.append('image', document.getElementById('image').files[0]);
-    formData.append('sizes', document.getElementById('sizes').value);
+    formData.append('description', description);
+    formData.append('sizes', document.getElementById('sizes').value.trim());
     formData.append('stock', document.getElementById('stock').value);
+    
+    const imageFile = document.getElementById('image').files[0];
+    if (imageFile) {
+        formData.append('image', imageFile);
+    }
 
     try {
         const url = currentProductId 
@@ -89,6 +100,9 @@ productForm.addEventListener('submit', async function(e) {
             throw new Error(error.message || 'Erreur lors de l\'ajout du produit');
         }
 
+        const result = await response.json();
+        console.log('Produit sauvegardé:', result);
+        
         alert(currentProductId ? 'Produit modifié avec succès' : 'Produit ajouté avec succès');
         closeProductModal();
         loadProducts();
